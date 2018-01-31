@@ -101,6 +101,8 @@ General helper functions.
 
 @defproc[(enumerate [x* (listof any/c)]) (listof (cons/c natural? any/c))]{
   Given a list of values @racket['(A B C)] return a list with each value indexed by its position @racket['((0 . A) (1 . B) (2 . C))].
+
+  See also @racket[in-indexed] and @racket[in-naturals].
 }
 
 @; -----------------------------------------------------------------------------
