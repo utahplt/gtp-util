@@ -1,6 +1,7 @@
 #lang scribble/manual
 
 @require[
+  scribble/example
   (for-label
     file/glob
     gtp-util/system
@@ -75,6 +76,16 @@ General helper functions.
 @defproc[(force/cpu-time [thunk (-> any)]) (values any/c natural?)]{
   Force the given thunk and record its running time.
   Return both the result of the thunk and the CPU time (as reported by @racket[time-apply]).
+}
+
+@defproc[(bitstring? [x any/c]) boolean?]{
+  Predicate for a string of @racket[#\1] and @racket[#\0] characters.
+
+  @examples[#:eval (make-base-eval '(require gtp-util))
+    (bitstring? "0011")
+    (bitstring? 3)
+    (bitstring? " 1")
+  ]
 }
 
 @defproc[(natural->bitstring [n natural?] [#:bits k natural?]) string?]{

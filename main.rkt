@@ -60,6 +60,9 @@
     [force/cpu-time
      (-> (-> any) (values any/c exact-nonnegative-integer?))]
 
+    [bitstring?
+      (-> any/c boolean?)]
+
     [natural->bitstring
      (-> exact-nonnegative-integer? #:bits exact-nonnegative-integer? string?)]
     ;; (natural->bitstring n k) converts `n` into a `k`-digit string of 1's and 0's
@@ -218,6 +221,12 @@
 (define (force/cpu-time t)
   (let-values ([(r* cpu real gc) (time-apply t '())])
     (values (car r*) cpu)))
+
+(define (bitstring? x)
+  (and (string? x)
+       (for/and ([c (in-string x)])
+         (or (eq? c #\0)
+             (eq? c #\1)))))
 
 ;; Convert a natural number to a binary string, padded to the supplied width
 (define (natural->bitstring n #:bits pad-width)
@@ -396,6 +405,19 @@
     (let-values ([(v c) (force/cpu-time (λ () 42))])
       (check-equal? v 42)
       (check-true (< c 10))))
+
+  (test-case "bitstring?"
+    (check-apply* bitstring?
+      [2
+       ==> #false]
+      ["asdf"
+       ==> #false]
+      ["003"
+       ==> #false]
+      ["0101"
+       ==> #true]
+      ["111111111"
+       ==> #true]))
 
   (test-case "natural->bitstring"
     (check-apply* natural->bitstring
