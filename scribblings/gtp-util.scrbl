@@ -8,6 +8,7 @@
     gtp-util
     racket/base
     racket/contract
+    racket/path
     (only-in racket/math natural?)
     (only-in openssl/md5 md5))]
 
@@ -19,6 +20,18 @@
 General helper functions.
 
 @defmodule[gtp-util]
+
+@defproc[(filename/c [x any/c]) boolean?]{
+  Flat contract for a @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{path or string}
+   that @racket[path-only] returns
+   @racket[#false] for.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (filename/c "segfault.mp3")
+    (filename/c (build-path "code.rkt"))
+    (filename/c (build-path "Desktop" "passwd.txt"))
+  ]
+}
 
 @defproc[(nonnegative-real/c [x any/c]) boolean?]{
   Flat contract for non-negative real numbers.
@@ -65,6 +78,10 @@ General helper functions.
 
 @defproc[(path-string->string [ps path-string?]) string?]{
   Convert a path or string to a string.
+}
+
+@defproc[(path-string->path [ps path-string?]) path?]{
+  Convert a path or string to a path.
 }
 
 @defproc[(ensure-directory [ps path-string?]) void?]{
@@ -161,6 +178,15 @@ General helper functions.
     (digit*->integer '(9 1 1))
   ]
 }
+
+@defproc[(filename-sort [ps* (listof filename/c)]) (listof filename/c)]{
+  Sort a list of filenames.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (filename-sort (list (build-path "foo.md") (build-path "bar.rkt")))
+  ]
+}
+
 
 @; -----------------------------------------------------------------------------
 

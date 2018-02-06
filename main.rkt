@@ -4,6 +4,9 @@
 
 (require racket/contract)
 (provide
+
+  filename/c
+
   nonnegative-real/c
 
   digit/c
@@ -30,6 +33,9 @@
     [path-string->string
      (-> path-string? string?)]
     ;; Convert a string or a path to a string
+
+    [path-string->path
+     (-> path-string? path?)]
 
     [ensure-directory
      (-> path-string? void?)]
@@ -99,6 +105,9 @@
 
     [integer->digit*
       (-> exact-integer? (listof digit/c))]
+
+    [filename-sort
+      (-> (listof filename/c) (listof filename/c))]
 ))
 
 (require
@@ -117,7 +126,8 @@
     set-union
     list->set)
   (only-in racket/path
-    file-name-from-path)
+    file-name-from-path
+    path-only)
   (only-in racket/list
     make-list)
   (only-in racket/string
@@ -127,6 +137,9 @@
 ;; =============================================================================
 
 (define-logger gtp-plot)
+
+(define filename/c
+  (flat-named-contract 'filename/c (and/c path-string?  (not/c path-only))))
 
 (define nonnegative-real/c
   (flat-named-contract 'nonnegative-real/c (>=/c 0)))
@@ -154,6 +167,9 @@
 
 (define (path-string->string ps)
   (if (string? ps) ps (path->string ps)))
+
+(define (path-string->path ps)
+  (if (string? ps) (string->path ps) ps))
 
 (define (rnd n)
   (~r n #:precision '(= 2)))
@@ -307,6 +323,9 @@
       acc+
       (loop acc+ (+ prev n) m+))))
 
+(define (filename-sort ps*)
+  (sort (map path-string->path ps*) path<?))
+
 ;; =============================================================================
 
 (module+ test
@@ -321,6 +340,19 @@
       (if (or (directory-exists? p) (file-exists? p))
         (loop (gensym))
         p)))
+
+  (test-case "filename/c"
+    (check-apply* filename/c
+     ["a.rkt"
+      ==> #true]
+     [(string->path "a.rkt")
+      ==> #true]
+     [(build-path "a.rkt")
+      ==> #true]
+     [(build-path "b" "a.rkt")
+      ==> #false]
+     [42
+      ==> #false]))
 
   (test-case "nonnegative-real/c"
     (check-pred nonnegative-real/c 0)
@@ -558,5 +590,14 @@
       ['() ==> 0]
       ['(1) ==> 1]
       ['(1 2 3) ==> 123]))
+
+  (test-case "filename-sort"
+    (check-apply* filename-sort
+      ['("a.rkt" "b.rkt" "c.rkt")
+       ==> (map string->path '("a.rkt" "b.rkt" "c.rkt"))]
+      ['()
+       ==> '()]
+      [(map string->path '("procedure" "is" "generally" "the" "right" "choice"))
+       ==> (map string->path '("choice" "generally" "is" "procedure" "right" "the"))]))
 
 )
