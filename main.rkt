@@ -6,6 +6,10 @@
 (provide
   nonnegative-real/c
 
+  unique-listof/c
+
+  no-duplicates?
+
   (contract-out
     [confidence-interval
      (-> (listof nonnegative-real/c) #:cv nonnegative-real/c (cons/c real? real?))]
@@ -118,6 +122,16 @@
 
 (define nonnegative-real/c
   (flat-named-contract 'nonnegative-real/c (>=/c 0)))
+
+(define (unique-listof/c ctc)
+  (and/c (listof ctc)
+         no-duplicates?))
+
+(define (no-duplicates? x*)
+  (let loop ([x* x*])
+    (or (null? x*)
+        (and (not (member (car x*) (cdr x*)))
+             (loop (cdr x*))))))
 
 (define TAB "\t")
 
@@ -282,6 +296,18 @@
     (check-false (nonnegative-real/c #f))
     (check-false (nonnegative-real/c -1))
     (check-false (nonnegative-real/c -0.00099)))
+
+  (test-case "unique-listof/c"
+    (check-pred (unique-listof/c symbol?) '())
+    (check-pred (unique-listof/c symbol?) '(A))
+    (check-pred (unique-listof/c symbol?) '(A B C))
+    (check-pred (unique-listof/c string?) '("A" "B" "C"))
+    (check-pred (unique-listof/c (listof integer?)) '((1) (1 2) (3)))
+
+    (check-false ((unique-listof/c integer?) 1))
+    (check-false ((unique-listof/c integer?) '#(1)))
+    (check-false ((unique-listof/c integer?) '(1 2 1)))
+    (check-false ((unique-listof/c string?) '("A" "B" "B"))))
 
   (test-case "confidence-interval"
     (define n* '(1 2 2 2 2 2 3))

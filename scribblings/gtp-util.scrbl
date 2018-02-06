@@ -11,6 +11,8 @@
     (only-in racket/math natural?)
     (only-in openssl/md5 md5))]
 
+@(define (make-gtp-util-eval) (make-base-eval '(require gtp-util)))
+
 @; -----------------------------------------------------------------------------
 @title[#:tag "top"]{GTP utilities}
 
@@ -20,6 +22,20 @@ General helper functions.
 
 @defproc[(nonnegative-real/c [x any/c]) boolean?]{
   Flat contract for non-negative real numbers.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (nonnegative-real/c 0)
+    (nonnegative-real/c (sqrt 2))
+    (nonnegative-real/c -2)
+  ]
+}
+
+@defproc[(unique-listof/c [c contract?]) list-contract?]{
+  Similar to @racket[listof], but rejects lists that contain two or more @racket[equal?] elements.
+
+  @examples[#:eval (make-gtp-util-eval)
+    ((unique-listof/c symbol?) '(u n i q))
+    ((unique-listof/c symbol?) '(r e p e a t))]
 }
 
 @defproc[(confidence-interval [r* (listof real?)] [#:cv confidence-value nonnegative-real/c 1.96]) (cons/c real? real?)]{
@@ -81,7 +97,7 @@ General helper functions.
 @defproc[(bitstring? [x any/c]) boolean?]{
   Predicate for a string of @racket[#\1] and @racket[#\0] characters.
 
-  @examples[#:eval (make-base-eval '(require gtp-util))
+  @examples[#:eval (make-gtp-util-eval)
     (bitstring? "0011")
     (bitstring? 3)
     (bitstring? " 1")
