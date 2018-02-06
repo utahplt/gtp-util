@@ -30,12 +30,25 @@ General helper functions.
   ]
 }
 
+@defproc[(digit/c [x any/c]) boolean?]{
+  Flat contract for exact integers bewteen 0 and 9, inclusive.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (digit/c 0)
+    (digit/c 5)
+    (digit/c -1)
+    (digit/c 1.1)
+    (digit/c 10)
+  ]
+}
+
 @defproc[(unique-listof/c [c contract?]) list-contract?]{
   Similar to @racket[listof], but rejects lists that contain two or more @racket[equal?] elements.
 
   @examples[#:eval (make-gtp-util-eval)
     ((unique-listof/c symbol?) '(u n i q))
-    ((unique-listof/c symbol?) '(r e p e a t))]
+    ((unique-listof/c symbol?) '(r e p e a t))
+  ]
 }
 
 @defproc[(confidence-interval [r* (listof real?)] [#:cv confidence-value nonnegative-real/c 1.96]) (cons/c real? real?)]{
@@ -130,6 +143,23 @@ General helper functions.
   Given a list of values @racket['(A B C)] return a list with each value indexed by its position @racket['((0 . A) (1 . B) (2 . C))].
 
   See also @racket[in-indexed] and @racket[in-naturals].
+}
+
+@defproc[(integer->digit* [i exact-integer?]) (listof digit/c)]{
+  Explode an integer to a list of its digits.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (integer->digit* 8675309)
+    (integer->digit* 0)
+  ]
+}
+
+@defproc[(digit*->integer [d* (listof digit/c)]) exact-integer?]{
+  Concatenate a sequence of digits into an integer.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (digit*->integer '(9 1 1))
+  ]
 }
 
 @; -----------------------------------------------------------------------------

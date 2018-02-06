@@ -6,6 +6,8 @@
 (provide
   nonnegative-real/c
 
+  digit/c
+
   unique-listof/c
 
   no-duplicates?
@@ -91,6 +93,12 @@
 
     [enumerate
       (-> list?  list?)]
+
+    [digit*->integer
+      (-> (listof digit/c) exact-integer?)]
+
+    [integer->digit*
+      (-> exact-integer? (listof digit/c))]
 ))
 
 (require
@@ -122,6 +130,9 @@
 
 (define nonnegative-real/c
   (flat-named-contract 'nonnegative-real/c (>=/c 0)))
+
+(define digit/c
+  (flat-named-contract 'digit/c (integer-in 0 9)))
 
 (define (unique-listof/c ctc)
   (and/c (listof ctc)
@@ -272,6 +283,30 @@
              [i (in-naturals)])
     (cons i x)))
 
+(define (digit*->integer d*)
+  (cond
+   [(null? d*)
+    0]
+   [else
+    (define m*
+      (for/fold ([acc '(1)])
+                ([_ (in-list (cdr d*))])
+        (cons (* 10 (car acc)) acc)))
+    (for/sum ([d (in-list d*)]
+              [m (in-list m*)])
+      (* d m))]))
+
+(define (integer->digit* i)
+  (let loop ([acc '()]
+             [prev 0]
+             [m 1])
+    (define m+ (* m 10))
+    (define n (quotient (- (modulo i m+) prev) m))
+    (define acc+ (cons n acc))
+    (if (< i m+)
+      acc+
+      (loop acc+ (+ prev n) m+))))
+
 ;; =============================================================================
 
 (module+ test
@@ -296,6 +331,14 @@
     (check-false (nonnegative-real/c #f))
     (check-false (nonnegative-real/c -1))
     (check-false (nonnegative-real/c -0.00099)))
+
+  (test-case "digit/c"
+    (check-apply* digit/c
+     [0 ==> #true]
+     [5 ==> #true]
+     [-1 ==> #false]
+     [1.1 ==> #false]
+     [10 ==> #false]))
 
   (test-case "unique-listof/c"
     (check-pred (unique-listof/c symbol?) '())
@@ -503,5 +546,17 @@
         (set-count (racket-filenames MY-DIR)))
       ;; cleanup
       (delete-directory/files MY-DIR)))
+
+  (test-case "integer->digit*"
+    (check-apply* integer->digit*
+      [0 => '(0)]
+      [1 ==> '(1)]
+      [123 ==> '(1 2 3)]))
+
+  (test-case "digit*->integer"
+    (check-apply* digit*->integer
+      ['() ==> 0]
+      ['(1) ==> 1]
+      ['(1 2 3) ==> 123]))
 
 )
