@@ -22,7 +22,7 @@
 }
 
 If you think one of these functions should "graduate" to another library
- or package, let me know at: @hyperlink["https://github.com/bennn/gtp-util/issues"]{github.com/bennn/gtp-util/issues}
+ or package, let me know at: @hyperlink["https://github.com/bennn/gtp-util/issues"]{@tt{github.com/bennn/gtp-util/issues}}
 
 @defproc[(filename/c [x any/c]) boolean?]{
   Flat contract for a @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{path or string}
