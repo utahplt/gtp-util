@@ -108,6 +108,13 @@
 
     [filename-sort
       (-> (listof filename/c) (listof filename/c))]
+
+    [whitespace-string?
+      (-> string? boolean?)]
+
+    [simple-comment-string?
+      (-> string? boolean?)]
+
 ))
 
 (require
@@ -131,6 +138,8 @@
   (only-in racket/list
     make-list)
   (only-in racket/string
+    string-trim
+    string-prefix?
     string-join
     string-split))
 
@@ -325,6 +334,13 @@
 
 (define (filename-sort ps*)
   (sort (map path-string->path ps*) path<?))
+
+(define (whitespace-string? str)
+  (zero? (string-length (string-trim str))))
+
+(define (simple-comment-string? str)
+  (define trimmed (string-trim str #:right? #f))
+  (string-prefix? trimmed ";"))
 
 ;; =============================================================================
 
@@ -599,5 +615,27 @@
        ==> '()]
       [(map string->path '("procedure" "is" "generally" "the" "right" "choice"))
        ==> (map string->path '("choice" "generally" "is" "procedure" "right" "the"))]))
+
+  (test-case "whitespace-string?"
+    (check-apply* whitespace-string?
+     [""
+      ==> #true]
+     ["    \t"
+      ==> #true]
+     ["    x"
+     ==> #false]))
+
+  (test-case "simple-comment-string?"
+    (check-apply* simple-comment-string?
+     [""
+      ==> #false]
+     ["   ;"
+      ==> #true]
+     ["    #;   (1 2 4)"
+     ==> #false]
+     ["#| |#"
+     ==> #false]
+     ["#|"
+     ==> #false]))
 
 )

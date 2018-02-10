@@ -190,6 +190,25 @@ If you think one of these functions should "graduate" to another library
   ]
 }
 
+@defproc[(whitespace-string? [str string?]) boolean?]{
+  Predicate for strings that contain only whitespace characters.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (whitespace-string? "  \n  \t")
+    (whitespace-string? "X")
+  ]
+}
+
+@defproc[(simple-comment-string? [str string?]) boolean?]{
+  Predicate for a string that begins with a semicolon.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (simple-comment-string? "     ;")
+    (simple-comment-string? "  #;(a b c)")
+    (simple-comment-string? "  #|")
+  ]
+}
+
 
 @; -----------------------------------------------------------------------------
 
