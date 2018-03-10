@@ -7,6 +7,7 @@
     gtp-util/system
     gtp-util
     racket/base
+    racket/date
     racket/contract
     racket/path
     (only-in racket/math natural?)
@@ -206,6 +207,17 @@ If you think one of these functions should "graduate" to another library
     (simple-comment-string? "     ;")
     (simple-comment-string? "  #;(a b c)")
     (simple-comment-string? "  #|")
+  ]
+}
+
+@defproc[(timestamp [time? any/c #false]) string?]{
+  The same as calling @racket[(date->string (current-date) time?)] with
+   @racket[date-display-format] set to @racket['iso-8601].
+  @; https://www.iso.org/standard/40874.html
+
+  @examples[#:eval (make-gtp-util-eval)
+    (timestamp)
+    (timestamp #false)
   ]
 }
 

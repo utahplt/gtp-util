@@ -115,6 +115,9 @@
     [simple-comment-string?
       (-> string? boolean?)]
 
+    [timestamp
+      (->* [] [any/c] string?)]
+
 ))
 
 (require
@@ -126,6 +129,10 @@
     ~r)
   (only-in racket/class
     send)
+  (only-in racket/date
+    date-display-format
+    date->string
+    current-date)
   (only-in pict
     pict?
     pict->bitmap)
@@ -341,6 +348,10 @@
 (define (simple-comment-string? str)
   (define trimmed (string-trim str #:right? #f))
   (string-prefix? trimmed ";"))
+
+(define (timestamp [time? #true])
+  (parameterize ((date-display-format 'iso-8601))
+    (date->string (current-date) time?)))
 
 ;; =============================================================================
 
