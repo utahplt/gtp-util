@@ -72,6 +72,18 @@
     [force/cpu-time
      (-> (-> any) (values any/c exact-nonnegative-integer?))]
 
+    [time-string->values
+      (-> string? (values exact-nonnegative-integer? exact-nonnegative-integer? exact-nonnegative-integer?))]
+
+    [time-string->cpu-time
+      (-> string? exact-nonnegative-integer?)]
+
+    [time-string->real-time
+      (-> string? exact-nonnegative-integer?)]
+
+    [time-string->gc-time
+      (-> string? exact-nonnegative-integer?)]
+
     [bitstring?
       (-> any/c boolean?)]
 
@@ -148,7 +160,8 @@
     string-trim
     string-prefix?
     string-join
-    string-split))
+    string-split)
+  (for-syntax racket/base))
 
 ;; =============================================================================
 
@@ -278,6 +291,32 @@
 (define (force/cpu-time t)
   (let-values ([(r* cpu real gc) (time-apply t '())])
     (values (car r*) cpu)))
+
+(define time-string->values
+  (let ()
+    (define TIME-RX #rx"^cpu time: ([0-9]+) real time: ([0-9]+) gc time: ([0-9]+)")
+    (define-syntax (time-match->values stx)
+      (syntax-case stx ()
+       [(_ match-val)
+        (with-syntax ([(acc ...) (list #'cadr #'caddr #'cadddr)])
+          (syntax/loc stx (values (string->number (acc match-val)) ...)))]))
+    (lambda (str)
+      (define m (regexp-match TIME-RX str))
+      (if m
+        (time-match->values m)
+        (raise-arguments-error 'time-string->values "param does not match 'time' regexp" "param" str "regexp" TIME-RX)))))
+
+(define (time-string->cpu-time str)
+  (let-values ([(cpu real gc) (time-string->values str)])
+    cpu))
+
+(define (time-string->real-time str)
+  (let-values ([(cpu real gc) (time-string->values str)])
+    real))
+
+(define (time-string->gc-time str)
+  (let-values ([(cpu real gc) (time-string->values str)])
+    gc))
 
 (define (bitstring? x)
   (and (string? x)
@@ -648,5 +687,22 @@
      ==> #false]
      ["#|"
      ==> #false]))
+
+  (test-case "time-string->values"
+    (check-apply* time-string->cpu-time
+     ["cpu time: 243240 real time: 242930 gc time: 92"
+      ==> 243240]
+     ["cpu time: 924 real time: 925 gc time: 80"
+      ==> 924])
+    (check-apply* time-string->real-time
+     ["cpu time: 243240 real time: 242930 gc time: 92"
+      ==> 242930]
+     ["cpu time: 924 real time: 925 gc time: 80"
+      ==> 925])
+    (check-apply* time-string->gc-time
+     ["cpu time: 243240 real time: 242930 gc time: 92"
+      ==> 92]
+     ["cpu time: 924 real time: 925 gc time: 80"
+      ==> 80]))
 
 )

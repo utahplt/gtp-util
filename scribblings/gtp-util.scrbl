@@ -128,6 +128,27 @@ If you think one of these functions should "graduate" to another library
   Return both the result of the thunk and the CPU time (as reported by @racket[time-apply]).
 }
 
+@defproc[(time-string->values [str string?]) (values exact-nonnegative-integer? exact-nonnegative-integer? exact-nonnegative-integer?)]{
+  Parse a string from the @racket[time] macro into a sequence of integers.
+
+  @examples[#:eval (make-base-eval '(require gtp-util racket/port))
+    (time-string->values
+      (with-output-to-string (λ () (time (sleep 1) (collect-garbage 'minor)))))]
+}
+
+@deftogether[(
+  @defproc[(time-string->cpu-time [str string?]) exact-nonnegative-integer?]
+  @defproc[(time-string->real-time [str string?]) exact-nonnegative-integer?]
+  @defproc[(time-string->gc-time [str string?]) exact-nonnegative-integer?])]{
+  Parse the corresponding field from a @racket[time]-generated string.
+
+  @examples[#:eval (make-base-eval '(require gtp-util racket/port))
+    (let ([time-str (with-output-to-string (λ () (time (sleep 1) (collect-garbage 'minor))))])
+      (values (time-string->cpu-time time-str)
+              (time-string->real-time time-str)
+              (time-string->gc-time time-str)))]
+}
+
 @defproc[(bitstring? [x any/c]) boolean?]{
   Predicate for a string of @racket[#\1] and @racket[#\0] characters.
 
