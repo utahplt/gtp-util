@@ -242,6 +242,14 @@ If you think one of these functions should "graduate" to another library
   ]
 }
 
+@defproc[(string->value [str string?]) any/c]{
+  Use @racket[read] to parse a value from a string.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (string->value "#true")
+    (string->value "#(A B (C))")]
+}
+
 
 @; -----------------------------------------------------------------------------
 

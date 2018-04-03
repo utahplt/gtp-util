@@ -130,6 +130,9 @@
     [timestamp
       (->* [] [any/c] string?)]
 
+    [string->value
+      (-> string? any/c)]
+
 ))
 
 (require
@@ -145,6 +148,8 @@
     date-display-format
     date->string
     current-date)
+  (only-in racket/port
+    with-input-from-string)
   (only-in pict
     pict?
     pict->bitmap)
@@ -391,6 +396,9 @@
 (define (timestamp [time? #true])
   (parameterize ((date-display-format 'iso-8601))
     (date->string (current-date) time?)))
+
+(define (string->value str)
+  (with-input-from-string str read))
 
 ;; =============================================================================
 
@@ -704,5 +712,10 @@
       ==> 92]
      ["cpu time: 924 real time: 925 gc time: 80"
       ==> 80]))
+
+  (test-case "string->value"
+    (check-equal? (string->value "hello") 'hello)
+    (check-equal? (string->value "42") 42)
+    (check-equal? (string->value "(\"oh\" no)") '("oh" no)))
 
 )
