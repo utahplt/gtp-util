@@ -17,10 +17,10 @@
 
   (contract-out
     [confidence-interval
-     (-> (listof nonnegative-real/c) #:cv nonnegative-real/c (cons/c real? real?))]
+     (->* [(listof nonnegative-real/c)] [#:cv nonnegative-real/c] (cons/c real? real?))]
 
     [confidence-offset
-     (-> (listof nonnegative-real/c) #:cv nonnegative-real/c nonnegative-real/c)]
+     (->* [(listof nonnegative-real/c)] [#:cv nonnegative-real/c] nonnegative-real/c)]
 
     [tab-split
      (-> string? (listof string?))]
