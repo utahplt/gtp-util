@@ -88,7 +88,7 @@
       (-> any/c boolean?)]
 
     [natural->bitstring
-     (-> exact-nonnegative-integer? #:bits exact-nonnegative-integer? string?)]
+     (-> exact-nonnegative-integer? #:bits exact-positive-integer? string?)]
     ;; (natural->bitstring n k) converts `n` into a `k`-digit string of 1's and 0's
 
     [bitstring->natural
@@ -596,6 +596,8 @@
 
   (test-case "natural->bitstring"
     (check-apply* natural->bitstring
+     [0 #:bits 4
+      ==> "0000"]
      [2 #:bits 2
       ==> "10"]
      [2 #:bits 10
