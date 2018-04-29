@@ -13,7 +13,6 @@
     racket/contract
     racket/path
     (only-in racket/math natural?)
-    (prefix-in rkt: (only-in racket/math order-of-magnitude))
     (only-in openssl/md5 md5))]
 
 @(define (make-gtp-util-eval) (make-base-eval '(require gtp-util)))
@@ -108,13 +107,6 @@ If you think one of these functions should "graduate" to another library
   Compute the base-2 logarithm of a number.
 
   Assumes @racket[n] is a power of 2.
-}
-
-@defproc[(order-of-magnitude [n real?]) natural?]{
-  Count the number of digits in the given number.
-
-  @(let-syntax ([order-of-magnitude (make-rename-transformer #'rkt:order-of-magnitude)])
-     @deprecated[#:what "function" @racket[order-of-magnitude]]{(from @racketmodname[racket/math])})
 }
 
 @defproc[(file-remove-extension [ps path-string?]) path-string?]{

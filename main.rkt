@@ -52,9 +52,6 @@
     [log2
      (-> exact-nonnegative-integer? exact-nonnegative-integer?)]
 
-    [order-of-magnitude
-     (-> real? exact-nonnegative-integer?)]
-
     [file-remove-extension
      (-> path-string? path-string?)]
     ;; Removes a Racket-added extension from a filename.
@@ -259,12 +256,6 @@
         (raise-argument-error 'log2 "power-of-2" n)]
        [else
         (loop (+ k 1))]))]))
-
-(define (order-of-magnitude n)
-  (let loop ([upper 10] [acc 0])
-    (if (< n upper)
-      acc
-      (loop (* upper 10) (+ acc 1)))))
 
 (define (save-pict fn p)
   (define bm (pict->bitmap p))
@@ -526,27 +517,6 @@
       (λ () (log2 -1)))
     (check-exn exn:fail:contract?
       (λ () (log2 72))))
-
-  (test-case "order-of-magnitude"
-    (check-apply* order-of-magnitude
-     [0
-      ==> 0]
-     [1
-      ==> 0]
-     [5
-      ==> 0]
-     [9
-      ==> 0]
-     [10
-      ==> 1]
-     [12.34
-      ==> 1]
-     [999
-      ==> 2]
-     [999.99999
-      ==> 2]
-     [1032
-      ==> 3]))
 
   (test-case "file-remove-extension"
     (check-equal? (file-remove-extension "foo_tab.gz") "foo.tab")
