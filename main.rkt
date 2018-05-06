@@ -101,6 +101,12 @@
            [path-string?]
           void?)]
 
+    [copy-directory/files*
+      (->* [(and/c path-string? directory-exists?)
+            (and/c path-string? directory-exists?)]
+           [path-string?]
+           void?)]
+
     [copy-racket-file*
       (-> (and/c path-string? directory-exists?)
           (and/c path-string? directory-exists?)
@@ -137,6 +143,8 @@
   (only-in math/statistics
     mean
     stddev/mean)
+  (only-in racket/file
+    copy-directory/files)
   (only-in racket/format
     ~r)
   (only-in racket/class
@@ -338,9 +346,15 @@
     1))
 
 (define (copy-file* src dst [pattern "*.*"])
+  (copy-thing copy-file src dst pattern))
+
+(define (copy-directory/files* src dst [pattern "*"])
+  (copy-thing copy-directory/files src dst pattern))
+
+(define (copy-thing f-copy src dst pattern)
   (for ([src-file (in-glob (build-path src pattern))])
     (define src-name (file-name-from-path src-file))
-    (copy-file src-file (build-path dst src-name))))
+    (f-copy src-file (build-path dst src-name))))
 
 (define (copy-racket-file* src dst)
   (copy-file* src dst "*.rkt"))

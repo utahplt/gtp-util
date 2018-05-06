@@ -171,12 +171,17 @@ If you think one of these functions should "graduate" to another library
    @racket{0} digits.
 }
 
-@defproc[(copy-file* [src directory-exists?] [dst directory-exists?] [pattern string? "*"]) void?]{
+@defproc[(copy-file* [src directory-exists?] [dst directory-exists?] [pattern string? "*.*"]) void?]{
   Copy every file from the directory @racket[src] whose name matches the given @racket[glob] pattern into the directory @racket[dst].
+  Raises an exception if @racket[src] contains a directory that matches the given pattern.
 }
 
 @defproc[(copy-racket-file* [src directory-exists?] [dst directory-exists?]) void?]{
   Same as @racket[(copy-file* src dst "*.rkt")].
+}
+
+@defproc[(copy-directory/files* [src directory-exists?] [dst directory-exists?] [pattern string? "*"]) void?]{
+  Copy every file and recursively copy every directory in @racket[src] whose name matches the given pattern into the directory @racket[dst].
 }
 
 @defproc[(enumerate [x* (listof any/c)]) (listof (cons/c natural? any/c))]{
