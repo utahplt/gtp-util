@@ -234,7 +234,7 @@ If you think one of these functions should "graduate" to another library
   ]
 }
 
-@defproc[(timestamp [time? any/c #false]) string?]{
+@defproc[(timestamp [time? any/c #true]) string?]{
   The same as calling @racket[(date->string (current-date) time?)] with
    @racket[date-display-format] set to @racket['iso-8601].
   @; https://www.iso.org/standard/40874.html
