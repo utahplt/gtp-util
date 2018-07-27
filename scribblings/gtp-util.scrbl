@@ -15,7 +15,14 @@
     (only-in racket/math natural?)
     (only-in openssl/md5 md5))]
 
-@(define (make-gtp-util-eval) (make-base-eval '(require gtp-util)))
+@(define (make-gtp-util-eval [extra-requires '()])
+   (make-base-eval (append '(require gtp-util)
+                           (if (list? extra-requires)
+                             extra-requires
+                             (list extra-requires)))))
+
+@(define (make-gtp-util/port-eval)
+   (make-gtp-util-eval 'racket/port))
 
 @; -----------------------------------------------------------------------------
 @title[#:tag "top"]{GTP utilities}
@@ -119,6 +126,11 @@ If you think one of these functions should "graduate" to another library
 
 @defproc[(columnize [x* list?] [num-cols natural?]) (listof list?)]{
   Divide a list into almost-equally-sized lists.
+
+  @examples[#:eval (make-gtp-util-eval 'racket/list)
+    (columnize '(a b c d e f) 2)
+    (columnize '(a b c d e) 2)
+  ]
 }
 
 @defproc[(force/cpu-time [thunk (-> any)]) (values any/c natural?)]{
@@ -129,7 +141,7 @@ If you think one of these functions should "graduate" to another library
 @defproc[(time-string->values [str string?]) (values exact-nonnegative-integer? exact-nonnegative-integer? exact-nonnegative-integer?)]{
   Parse a string from the @racket[time] macro into a sequence of integers.
 
-  @examples[#:eval (make-base-eval '(require gtp-util racket/port))
+  @examples[#:eval (make-gtp-util/port-eval)
     (time-string->values
       (with-output-to-string (λ () (time (sleep 1) (collect-garbage 'minor)))))]
 }
@@ -140,7 +152,7 @@ If you think one of these functions should "graduate" to another library
   @defproc[(time-string->gc-time [str string?]) exact-nonnegative-integer?])]{
   Parse the corresponding field from a @racket[time]-generated string.
 
-  @examples[#:eval (make-base-eval '(require gtp-util racket/port))
+  @examples[#:eval (make-gtp-util/port-eval)
     (let ([time-str (with-output-to-string (λ () (time (sleep 1) (collect-garbage 'minor))))])
       (values (time-string->cpu-time time-str)
               (time-string->real-time time-str)
