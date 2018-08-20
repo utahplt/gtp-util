@@ -12,6 +12,7 @@
     racket/date
     racket/contract
     racket/path
+    (only-in pict pict?)
     (only-in racket/math natural?)
     (only-in openssl/md5 md5))]
 
@@ -133,7 +134,7 @@ If you think one of these functions should "graduate" to another library
   ]
 }
 
-@defproc[(force/cpu-time [thunk (-> any)]) (values any/c natural?)]{
+@defproc[(force/cpu-time [thunk (-> any/c)]) (values any/c natural?)]{
   Force the given thunk and record its running time.
   Return both the result of the thunk and the CPU time (as reported by @racket[time-apply]).
 }
