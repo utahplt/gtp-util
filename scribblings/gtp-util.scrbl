@@ -10,6 +10,7 @@
     gtp-util
     racket/base
     racket/date
+    racket/format
     racket/contract
     racket/path
     (only-in pict pict?)
@@ -105,6 +106,7 @@ If you think one of these functions should "graduate" to another library
 
 @defproc[(rnd [r real?]) string?]{
   Round the given number to two decimal places.
+  Returns the same result as @racket[(~r n #:precision '(= 2))] except that it can be typed faster.
 }
 
 @defproc[(pct [a real?] [b real?]) real?]{
