@@ -278,7 +278,7 @@ If you think one of these functions should "graduate" to another library
 
 See also @racketmodname[racket/system].
 
-@defproc[(shell [cmd path-string?] [arg* (or/c path-string? (listof path-string?))] ...) string?]{
+@defproc[(shell [cmd path-string?] [arg* (or/c path-string? (listof path-string?))]) string?]{
   Finds the executable that @racket[cmd] denotes, then invokes it with the given arguments.
   Returns a string containing all output from the system call.
   Raises an @racket[exn:fail:user?] exception if the executable exits uncleanly.
