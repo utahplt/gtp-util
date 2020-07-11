@@ -66,6 +66,11 @@
     ;; Split a list into almost-equally-sized components.
     ;; Order / partitioning of elements is unspecified.
 
+    [take*
+     (-> list? exact-nonnegative-integer? (listof list?))]
+    ;; Division. Splits a list into lists of size N except
+    ;; the final list may be shorter.
+
     [force/cpu-time
      (-> (-> any) (values any/c exact-nonnegative-integer?))]
 
@@ -291,6 +296,13 @@
       (for/list ([h (in-list hd)]
                  [y* (in-list y**)])
         (cons h y*))])))
+
+(define (take* x* n)
+  (let loop ([x* x*])
+    (if (null? x*)
+      '()
+      (let-values (((hd tl) (safe-take x* n)))
+        (cons hd (loop tl))))))
 
 (define (force/cpu-time t)
   (let-values ([(r* cpu real gc) (time-apply t '())])

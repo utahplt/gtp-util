@@ -136,6 +136,16 @@ If you think one of these functions should "graduate" to another library
   ]
 }
 
+@defproc[(take* [x* list?] [n natural?]) (listof list?)]{
+  Divide a list into lists of length @racket[n], but the final
+   list may be shorter.
+
+  @examples[#:eval (make-gtp-util-eval 'racket/list)
+    (take* '(a b c d e f) 2)
+    (take* '(a b c d e) 2)
+  ]
+}
+
 @defproc[(force/cpu-time [thunk (-> any/c)]) (values any/c natural?)]{
   Force the given thunk and record its running time.
   Return both the result of the thunk and the CPU time (as reported by @racket[time-apply]).
