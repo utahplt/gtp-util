@@ -279,7 +279,7 @@ If you think one of these functions should "graduate" to another library
 }
 
 @defproc[(seconds->sql-timestamp [n (or/c string? real?)]) string?]{
-  Convert a platform-specific time in seconds (see @racket[date->seconds])
+  Convert a platform-specific time in seconds (see @racket[seconds->date])
    to a @hyperlink["https://dev.mysql.com/doc/refman/8.0/en/datetime.html"]{SQL timestamp}.
 
   @examples[#:eval (make-gtp-util-eval)
