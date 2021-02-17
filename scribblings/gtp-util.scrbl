@@ -278,6 +278,15 @@ If you think one of these functions should "graduate" to another library
     (string->value "#(A B (C))")]
 }
 
+@defproc[(seconds->sql-timestamp [n (or/c string? real?)]) string?]{
+  Convert a platform-specific time in seconds (see @racket[date->seconds])
+   to a @hyperlink["https://dev.mysql.com/doc/refman/8.0/en/datetime.html"]{SQL timestamp}.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (seconds->sql-timestamp 1611969956)
+    (seconds->sql-timestamp "1611969956")]
+}
+
 
 @; -----------------------------------------------------------------------------
 

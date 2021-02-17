@@ -141,6 +141,9 @@
     [string->value
       (-> string? any/c)]
 
+    [seconds->sql-timestamp
+      (-> (or/c string? real?) string?)]
+
 ))
 
 (require
@@ -416,6 +419,21 @@
 
 (define (string->value str)
   (with-input-from-string str read))
+
+(define (seconds->sql-timestamp pre-n)
+  (define dd
+    (let* ((n (if (string? pre-n) (string->number pre-n) pre-n)))
+      (seconds->date n)))
+  (format "~a-~a-~a ~a:~a:~a"
+          (date-year dd)
+          (~r2 (date-month dd))
+          (~r2 (date-day dd))
+          (~r2 (date-hour dd))
+          (~r2 (date-minute dd))
+          (~r2 (date-second dd))))
+
+(define (~r2 n)
+  (~r n #:min-width 2 #:pad-string "0"))
 
 ;; =============================================================================
 
@@ -715,5 +733,9 @@
     (check-equal? (string->value "hello") 'hello)
     (check-equal? (string->value "42") 42)
     (check-equal? (string->value "(\"oh\" no)") '("oh" no)))
+
+  (test-case "seconds->sql-timestamp"
+    (check-equal? (seconds->sql-timestamp "1611969956") "2021-01-29 20:25:56")
+    (check-equal? (seconds->sql-timestamp 1611970000) "2021-01-29 20:26:40"))
 
 )
