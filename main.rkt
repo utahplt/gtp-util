@@ -144,6 +144,9 @@
     [seconds->sql-timestamp
       (-> (or/c string? real?) string?)]
 
+    [sql-timestamp->seconds
+      (-> string? exact-nonnegative-integer?)]
+
 ))
 
 (require
@@ -160,6 +163,7 @@
   (only-in racket/date
     date-display-format
     date->string
+    date->seconds
     current-date)
   (only-in racket/port
     with-input-from-string)
@@ -431,6 +435,27 @@
           (~r2 (date-hour dd))
           (~r2 (date-minute dd))
           (~r2 (date-second dd))))
+
+(define (sql-timestamp->seconds ts)
+  (define-values [year-str time-str]
+    (let* ((s* (string-split ts " "))
+           (s* (if (= 2 (length s*)) s* (string-split ts "T"))))
+      (values (car s*) (cadr s*))))
+  (define dd
+    (let* ((yymmdd (string-split year-str "-"))
+           (hhmmss (string-split time-str ":")))
+      (date
+        (string->number (caddr hhmmss))
+        (string->number (cadr hhmmss))
+        (string->number (car hhmmss))
+        (string->number (caddr yymmdd))
+        (string->number (cadr yymmdd))
+        (string->number (car yymmdd))
+        0
+        0
+        #f
+        0)))
+  (date->seconds dd))
 
 (define (~r2 n)
   (~r n #:min-width 2 #:pad-string "0"))
@@ -737,5 +762,9 @@
   (test-case "seconds->sql-timestamp"
     (check-equal? (seconds->sql-timestamp "1611969956") "2021-01-29 20:25:56")
     (check-equal? (seconds->sql-timestamp 1611970000) "2021-01-29 20:26:40"))
+
+  (test-case "sql-timestamp->seconds"
+    (check-equal? (sql-timestamp->seconds "2021-01-29 20:25:56") 1611969956)
+    (check-equal? (sql-timestamp->seconds "2021-01-29T20:26:40") 1611970000))
 
 )

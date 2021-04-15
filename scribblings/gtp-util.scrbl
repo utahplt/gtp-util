@@ -287,6 +287,14 @@ If you think one of these functions should "graduate" to another library
     (seconds->sql-timestamp "1611969956")]
 }
 
+@defproc[(sql-timestamp->seconds [ts string?]) exact-nonnegative-integer?]{
+  Revert a SQL timestamp to a POSIX time.
+
+  @examples[#:eval (make-gtp-util-eval)
+    (sql-timestamp->seconds "2020-04-15 14:53:33")
+    (sql-timestamp->seconds "1994-12-18T04:13:52")]
+}
+
 
 @; -----------------------------------------------------------------------------
 
