@@ -295,6 +295,15 @@ If you think one of these functions should "graduate" to another library
     (sql-timestamp->seconds "1994-12-18T04:13:52")]
 }
 
+@defproc[(glob-first [pat glob/c] [#:choose choose (or/c #f (-> (listof path-string?) any)) first]) any]{
+  Similar to @racket[(first (glob pat))], but prints a message when there are
+  multiple results to choose from.
+
+  Use the optional argument @racket[_choose] to raise an error for multiple results,
+  or to disambiguate in a different way.
+
+  @history[#:added "0.4"]
+}
 
 @; -----------------------------------------------------------------------------
 

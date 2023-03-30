@@ -147,6 +147,9 @@
     [sql-timestamp->seconds
       (-> string? exact-nonnegative-integer?)]
 
+    [glob-first
+      (->* (any/c) (#:choose (or/c #f (-> (listof path-string?) any))) any)]
+
 ))
 
 (require
@@ -187,7 +190,7 @@
 
 ;; =============================================================================
 
-(define-logger gtp-plot)
+(define-logger gtp-util)
 
 (define filename/c
   (flat-named-contract 'filename/c (and/c path-string?  (not/c path-only))))
@@ -460,13 +463,27 @@
 (define (~r2 n)
   (~r n #:min-width 2 #:pad-string "0"))
 
+(define (glob-first str #:choose [choose-fn #f])
+  (define mm* (glob str))
+  (cond
+    ((null? mm*)
+     (raise-user-error 'glob-first "No results for pattern '~a'" str))
+    ((null? (cdr mm*))
+     (car mm*))
+    (choose-fn
+     (choose-fn mm*))
+    (else
+     (log-gtp-util-error "glob-first: ambiguous results for pattern '~a', returning the first" str)
+     (car mm*))))
+
 ;; =============================================================================
 
 (module+ test
-  (require rackunit rackunit-abbrevs (only-in pict blank))
+  (require rackunit rackunit-abbrevs racket/runtime-path (only-in pict blank))
 
   (define CI? (equal? "true" (getenv "CI")))
   (define temp-dir (find-system-path 'temp-dir))
+  (define-runtime-path cwd ".")
 
   (define (make-fresh-filename)
     (let loop ((s (gensym)))
@@ -766,5 +783,15 @@
   (test-case "sql-timestamp->seconds"
     (check-equal? (sql-timestamp->seconds "2021-01-29 20:25:56") 1611969956)
     (check-equal? (sql-timestamp->seconds "2021-01-29T20:26:40") 1611970000))
+
+  (test-case "glob-first"
+    (unless CI?
+      (define lname "LICENSE.txt")
+      (define rkt-pat (build-path cwd "*.rkt"))
+      (check-equal? (path->string (file-name-from-path (glob-first (build-path cwd lname)))) lname)
+      (check-equal? (file-name-from-path (glob-first rkt-pat))
+                    (file-name-from-path (car (glob rkt-pat))))
+      (check-exn exn:fail:user?
+                 (lambda () (glob-first "NOFILEMATCHING PATTERN")))))
 
 )
